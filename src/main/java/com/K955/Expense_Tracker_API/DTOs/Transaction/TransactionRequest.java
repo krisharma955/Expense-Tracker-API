@@ -1,0 +1,17 @@
+package com.K955.Expense_Tracker_API.DTOs.Transaction;
+
+import com.K955.Expense_Tracker_API.Enum.Category;
+import com.K955.Expense_Tracker_API.Enum.TransactionType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record TransactionRequest(
+        String title,
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        Category category,
+        TransactionType type
+) {
+}
