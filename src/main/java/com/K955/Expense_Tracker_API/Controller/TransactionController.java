@@ -3,10 +3,13 @@ package com.K955.Expense_Tracker_API.Controller;
 import com.K955.Expense_Tracker_API.DTOs.Transaction.TransactionRequest;
 import com.K955.Expense_Tracker_API.DTOs.Transaction.TransactionResponse;
 import com.K955.Expense_Tracker_API.DTOs.Transaction.UpdateTransactionRequest;
+import com.K955.Expense_Tracker_API.Enum.Category;
+import com.K955.Expense_Tracker_API.Enum.TransactionType;
 import com.K955.Expense_Tracker_API.Security.JwtAuthUtil;
 import com.K955.Expense_Tracker_API.Service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +36,27 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactionById(userId, transactionId));
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
+//        Long userId = jwtAuthUtil.getCurrentUserId();
+//        return ResponseEntity.ok(transactionService.getAllTransactions(userId));
+//    }
+
     @GetMapping
-    public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
+    public ResponseEntity<Page<TransactionResponse>> getAllTransactionsPageSortSearch(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false)Category category,
+            @RequestParam(required = false)TransactionType type,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String dir
+            ) {
         Long userId = jwtAuthUtil.getCurrentUserId();
-        return ResponseEntity.ok(transactionService.getAllTransactions(userId));
+        return ResponseEntity.ok(transactionService
+                .getAllTransactions(userId, keyword, category, type, month, year, page, size, sortBy, dir));
     }
 
     @PatchMapping("/{transactionId}")

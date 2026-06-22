@@ -5,16 +5,25 @@ import com.K955.Expense_Tracker_API.DTOs.Transaction.TransactionResponse;
 import com.K955.Expense_Tracker_API.DTOs.Transaction.UpdateTransactionRequest;
 import com.K955.Expense_Tracker_API.Entity.Transaction;
 import com.K955.Expense_Tracker_API.Entity.User;
+import com.K955.Expense_Tracker_API.Enum.Category;
+import com.K955.Expense_Tracker_API.Enum.TransactionType;
 import com.K955.Expense_Tracker_API.Exception.BadRequestException;
 import com.K955.Expense_Tracker_API.Exception.ResourceNotFoundException;
 import com.K955.Expense_Tracker_API.Mapper.TransactionMapper;
 import com.K955.Expense_Tracker_API.Repository.TransactionRepository;
 import com.K955.Expense_Tracker_API.Repository.UserRepository;
 import com.K955.Expense_Tracker_API.Service.TransactionService;
+import com.K955.Expense_Tracker_API.Specifications.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -56,14 +65,6 @@ public class TransactionServiceImpL implements TransactionService {
     }
 
     @Override
-    public List<TransactionResponse> getAllTransactions(Long userId) {
-        List<Transaction> transactionList = transactionRepository.findAllAccessibleTransactions(userId);
-        return transactionList.stream()
-                .map(transactionMapper::toTransactionResponse)
-                .toList();
-    }
-
-    @Override
     public TransactionResponse updateTransactionById(Long userId, Long transactionId, UpdateTransactionRequest request) {
         User user = getUser(userId);
         Transaction transaction = getTransaction(transactionId);
@@ -95,6 +96,50 @@ public class TransactionServiceImpL implements TransactionService {
 
         transaction.setDeletedAt(Instant.now());
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public Page<TransactionResponse> getAllTransactions(Long userId, String keyword, Category category, TransactionType type, Integer month, Integer year, int page, int size, String sortBy, String dir) {
+        Sort sort = dir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Transaction> spec =
+                Specification.where(
+                        TransactionSpecification.hasUserId(userId)
+                );
+
+        if(category != null) {
+            spec = spec.and(
+                    TransactionSpecification.hasCategory(category)
+            );
+        }
+
+        if(type != null) {
+            spec = spec.and(
+                    TransactionSpecification.hasType(type)
+            );
+        }
+
+        if(keyword != null && !keyword.isBlank()) {
+            spec = spec.and(
+                    TransactionSpecification.titleContains(keyword)
+            );
+        }
+
+        if(month != null && year != null) {
+            LocalDate startDate = LocalDate.of(year, month, 1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+            spec = spec.and(
+                    TransactionSpecification.betweenDates(startDate, endDate)
+            );
+        }
+
+        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
+        return transactions.map(transactionMapper::toTransactionResponse);
     }
 
     /// Util Methods
