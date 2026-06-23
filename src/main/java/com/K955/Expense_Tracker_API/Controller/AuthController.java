@@ -4,6 +4,7 @@ import com.K955.Expense_Tracker_API.DTOs.Auth.AuthResponse;
 import com.K955.Expense_Tracker_API.DTOs.Auth.LoginRequest;
 import com.K955.Expense_Tracker_API.DTOs.Auth.SignupRequest;
 import com.K955.Expense_Tracker_API.Service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
+    @Operation(summary = "SIGNUP")
     public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(request));
     }
 
     @PostMapping("/login")
+    @Operation(summary = "LOGIN")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
