@@ -7,6 +7,7 @@ import com.K955.Expense_Tracker_API.Enum.Category;
 import com.K955.Expense_Tracker_API.Enum.TransactionType;
 import com.K955.Expense_Tracker_API.Security.JwtAuthUtil;
 import com.K955.Expense_Tracker_API.Service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,24 +26,21 @@ public class TransactionController {
     private final JwtAuthUtil jwtAuthUtil;
 
     @PostMapping
+    @Operation(summary = "Create a New Transaction")
     public ResponseEntity<TransactionResponse> createNewTransaction(@Valid @RequestBody TransactionRequest request) {
         Long userId = jwtAuthUtil.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createNewTransaction(userId, request));
     }
 
     @GetMapping("/{transactionId}")
+    @Operation(summary = "Find Transaction By Id")
     public ResponseEntity<TransactionResponse> findTransactionById(@PathVariable Long transactionId) {
         Long userId = jwtAuthUtil.getCurrentUserId();
         return ResponseEntity.ok(transactionService.getTransactionById(userId, transactionId));
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
-//        Long userId = jwtAuthUtil.getCurrentUserId();
-//        return ResponseEntity.ok(transactionService.getAllTransactions(userId));
-//    }
-
     @GetMapping
+    @Operation(summary = "Filtering on Transactions")
     public ResponseEntity<Page<TransactionResponse>> getAllTransactionsPageSortSearch(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false)Category category,
@@ -60,6 +58,7 @@ public class TransactionController {
     }
 
     @PatchMapping("/{transactionId}")
+    @Operation(summary = "Update Transaction By Id")
     public ResponseEntity<TransactionResponse> updateTransactionById(@PathVariable Long transactionId,
                                                                      @Valid @RequestBody UpdateTransactionRequest request) {
         Long userId = jwtAuthUtil.getCurrentUserId();
@@ -67,6 +66,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{transactionId}")
+    @Operation(summary = "Delete Transaction By Id")
     public ResponseEntity<Void> deleteTransactionById(@PathVariable Long transactionId) {
         Long userId = jwtAuthUtil.getCurrentUserId();
         transactionService.deleteTransactionById(userId, transactionId);
