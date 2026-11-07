@@ -21,6 +21,9 @@ spring:
 server:
   port: ${PORT:8080}
 
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+
 jwt:
   secret-key: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
