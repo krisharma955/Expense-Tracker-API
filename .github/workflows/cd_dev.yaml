@@ -9,11 +9,11 @@ jobs:
     name: Redeploying the changes to the dev
     steps:
       - name: SSH into the Server
-      - run: |
+        run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
           mkdir -p /home/runner/.ssh
           ls /home/runner/.ssh
           touch /home/runner/.ssh/known_hosts
           echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
-          chmod 700 /home/runner/shh_key
-          ssh -i ~/ssh_key ubuntu@15.135.71.67 -t " cd Expense-Tracker-API/ && git pull origin main && source export PATH=/home/ubuntu/.nvm/versions/node/v26.13.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && mvn clean package -DskipTests && pm2 restart 0"
+          chmod 700 /home/runner/ssh_key
+          ssh -i ~/ssh_key ubuntu@15.135.71.67 -t " cd Expense-Tracker-API/ && git pull origin main && export PATH=/home/ubuntu/.nvm/versions/node/v26.13.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && mvn clean package -DskipTests && pm2 restart 0"
