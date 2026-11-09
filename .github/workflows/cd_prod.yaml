@@ -13,7 +13,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ssh_key
           chmod 600 ~/.ssh/ssh_key
-          printf '%s\n' "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          printf '%s\n' "${{ secrets.KNOWN_HOSTS_PROD }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
           ssh -i ~/.ssh/ssh_key -o StrictHostKeyChecking=yes ubuntu@16.178.218.195 \
             "set -e; export PATH=/home/ubuntu/.nvm/versions/node/v26.13.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin; cd Expense-Tracker-API/ && git pull origin production && mvn clean package -DskipTests && pm2 restart 0"
